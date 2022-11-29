@@ -13,6 +13,10 @@ if(process.env.NODE_ENV !== "production") {
   app.use(morgan('dev'));
 }
 
+app.use("/",(req,res) => {
+    res.send("Server of Free Space is running");
+});
+
 const PORT = process.env.PORT || 8000;
 const start = async () => {
     try{

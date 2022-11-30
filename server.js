@@ -19,7 +19,7 @@ app.use(express.json({limit: "5mb"}));
 app.use(express.urlencoded({extended: true}));
 
 
-app.use("/api/auth",auth);
+app.use("/api?auth",auth);
 
 app.use("/",(req,res) => {
     res.send("Server of Free Space is running");

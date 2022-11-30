@@ -6,12 +6,20 @@ import morgan from "morgan";
 import dotenv from "dotenv";
 dotenv.config();
 
+import auth from "./routes/auth.js";
 const app = express();
 const server = http.createServer(app);
 
 if(process.env.NODE_ENV !== "production") {
   app.use(morgan('dev'));
 }
+
+app.use(express.json({limit: "5mb"}));
+
+app.use(express.urlencoded({extended: true}));
+
+
+app.use("/api?auth",auth);
 
 app.use("/",(req,res) => {
     res.send("Server of Free Space is running");

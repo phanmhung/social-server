@@ -28,7 +28,7 @@ app.use("/",(req,res) => {
 const PORT = process.env.PORT || 8000;
 const start = async () => {
     try{
-        await mongoose.connect(process.env.URL)
+        await mongoose.connect(process.env.MONGO_URL)
         .then(() => console.log("Connected to MongoDB"));
 
         server.listen(PORT, () => {

@@ -20,6 +20,7 @@
     "morgan": "^1.10.0",
     "nanoid": "^4.0.0",
     "nodemon": "^2.0.20",
+    "socket.io": "^4.5.4",
     "validator": "^13.7.0"
   },
   "type": "module"

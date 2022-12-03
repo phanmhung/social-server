@@ -1,12 +1,13 @@
 import express from 'express';
 import * as http from 'http';
 import mongoose from 'mongoose';
-
+import cors from 'cors';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
 dotenv.config();
 
 import auth from './routes/auth.js';
+import { Server } from 'socket.io';
 const app = express();
 const server = http.createServer(app);
 

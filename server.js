@@ -8,6 +8,7 @@ dotenv.config();
 
 import auth from './routes/auth.js';
 import { Server } from 'socket.io';
+import post from './routes/post.js';
 const app = express();
 const server = http.createServer(app);
 
@@ -40,6 +41,7 @@ app.use(
 )
 
 app.use('/api/auth', auth);
+app.use('/api/post', post);
 
 app.use('/', (req, res) => {
   res.send('Server of Free Space is running');

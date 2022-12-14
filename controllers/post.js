@@ -17,7 +17,7 @@ const createPost = async(req,res)=>{
     try{
         const post = await Post.create({
             content,
-            postedBy: req.user._id,
+            postedBy: req.user.userId,
             image,
         });
 
@@ -35,10 +35,13 @@ const createPost = async(req,res)=>{
 };
 
 const uploadImage = async (req,res)=>{
+    console.log("uploading")
     try{
         const path = req.files.image.path;
 
-        const result = await cloudinary.v2.uploader.upload(path);
+        const result = await cloudinary.v2.uploader.upload(path,{
+            "width": 1000, "crop": "scale"
+        });
         return res.status(200).json({
             url:result.url,
             public_id:result.public_id

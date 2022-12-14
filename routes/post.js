@@ -11,6 +11,6 @@ router.route('/').get( async(req,res)=>{
 router.route('/create-post').post(createPost);
 
 //upload image
-router.route('/upload-image').post(formidable ,uploadImage);
+router.route('/upload-image').post(formidable() ,uploadImage);
 
 export default router;

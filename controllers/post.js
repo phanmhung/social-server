@@ -53,8 +53,37 @@ const uploadImage = async (req,res)=>{
     }
 };
 
+const newsFeed = async ( req,res)=>{
+    try{
+        const {userId} = req.user;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(400).json({message:"User not found"});
+        }
+
+        let {following} = user;
+        following.push(req.user.userId);
+
+        //pagination
+
+        const page = Number(req.query.page) || 1;
+        const perPage = Number(req.query.page) || 3;
+
+        const posts = await Post.find({postedBy:{$in:following}})
+            .skip((page-1)*perPage)
+            .populate("postedBy","-password -secret")
+            .populate("comments.postedBy","-password -secret")
+            .sort("-createdAt")
+            .limit(perPage);
+        return res.status(200).json({posts});
+    } catch(error) {
+        console.log(error);
+        return res.status(400).json({message:"err"});
+    }
+}
 
 export {
     createPost,
     uploadImage,
+    newsFeed,
 }

@@ -90,7 +90,44 @@ const login = async(req,res)=>{
     return res.status(200).json({token,user});
 };
 
+const addFollower = async (req, res,next ) => {
+    try{
+        const user = await User.findByIdAndUpdate(req.body.userId,{
+            $addToSet: {
+                followers: req.user.userId
+            },
+        });
+        if(!user){
+            res.status(400).json({msg:"User not found"});
+        }
+        next();
+    }
+    catch(err){
+        return res.status(400).json({msg:err.message});
+    }
+};
+
+const userFollower = async (req, res) => {
+    try{
+        const user = await User.findByIdAndUpdate(
+            req.user.userId, 
+            {
+            $addToSet: {following: req.body.userId},
+        },
+        {new: true}
+    );
+
+    if(!user){
+        return res.status(400).json({msg:"User not found"});
+    }
+    res.status(200).json({msg:"Followed successfully"});
+    } catch(err){
+        return res.status(400).json({msg:err.message});
+    }
+}
 export {
     register,
-    login
+    login,
+    userFollower,
+    addFollower,
 };

@@ -55,6 +55,7 @@ const uploadImage = async (req,res)=>{
 
 const newsFeed = async ( req,res)=>{
     try{
+        console.log("test");
         const {userId} = req.user;
         const user = await User.findById(userId);
         if(!user){
@@ -68,13 +69,14 @@ const newsFeed = async ( req,res)=>{
 
         const page = Number(req.query.page) || 1;
         const perPage = Number(req.query.page) || 3;
-
+        
         const posts = await Post.find({postedBy:{$in:following}})
             .skip((page-1)*perPage)
             .populate("postedBy","-password -secret")
             .populate("comments.postedBy","-password -secret")
             .sort("-createdAt")
             .limit(perPage);
+            console.log("🚀 ~ file: post.js:79 ~ newsFeed ~ posts", posts)
         return res.status(200).json({posts});
     } catch(error) {
         console.log(error);

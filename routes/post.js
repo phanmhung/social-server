@@ -9,7 +9,7 @@ router.route('/').get( async(req,res)=>{
 })
 
 router.route('/create-post').post(createPost);
-router.route('/newsfeed/').get(newsFeed);
+router.route('/news-feed/').get(newsFeed);
 //upload image
 router.route('/upload-image').post(formidable() ,uploadImage);
 

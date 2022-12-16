@@ -55,7 +55,7 @@ const uploadImage = async (req,res)=>{
 
 const newsFeed = async ( req,res)=>{
     try{
-        console.log("test");
+        
         const {userId} = req.user;
         const user = await User.findById(userId);
         if(!user){
@@ -76,7 +76,7 @@ const newsFeed = async ( req,res)=>{
             .populate("comments.postedBy","-password -secret")
             .sort("-createdAt")
             .limit(perPage);
-            console.log("🚀 ~ file: post.js:79 ~ newsFeed ~ posts", posts)
+            
         return res.status(200).json({posts});
     } catch(error) {
         console.log(error);

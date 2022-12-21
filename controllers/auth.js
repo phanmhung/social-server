@@ -125,9 +125,24 @@ const userFollower = async (req, res) => {
         return res.status(400).json({msg:err.message});
     }
 }
+
+const getInformationUser = async (req, res) => {
+    try{
+        const _id = req.params.id;
+        const user = await User.findById(_id).select("-password -secret");
+        if(!user){
+            return res.status(400).json({msg:"User not found"});
+        }
+        return res.status(200).json({user});
+    } catch(error){
+        console.log(error);
+        return res.status(400).json({msg:error.message});
+    }
+}
 export {
     register,
     login,
     userFollower,
     addFollower,
+    getInformationUser
 };

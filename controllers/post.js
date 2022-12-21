@@ -84,8 +84,24 @@ const newsFeed = async ( req,res)=>{
     }
 }
 
+const getPostWithUserId = async (req,res)=>{
+    try{
+        const {userId} = req.param.userId;
+        const posts = await User.findById({postedBy: {_id:userId}})
+        .populate("postedBy","-password -secret")
+        .populate("comments.postedBy","-password -secret")
+        .sort({createdAt:-1});
+    return res.status(200).json({posts});
+    }
+    catch(error){
+        console.log(error);
+        return res.status(400).json({message:"err"});
+    }
+}
+
 export {
     createPost,
     uploadImage,
     newsFeed,
+    getPostWithUserId
 }

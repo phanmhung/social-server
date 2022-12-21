@@ -1,6 +1,6 @@
 import express from "express";
 import formidable from "express-formidable";
-import { createPost, newsFeed, uploadImage } from "../controllers/post.js";
+import { createPost, getPostWithUserId, newsFeed, uploadImage } from "../controllers/post.js";
 
 const router = express.Router();
 
@@ -13,5 +13,5 @@ router.route('/news-feed/').get(newsFeed);
 //upload image
 router.route('/upload-image').post(formidable() ,uploadImage);
 
-
+router.route('/getPostWithUser/:userId').get(getPostWithUserId);
 export default router;

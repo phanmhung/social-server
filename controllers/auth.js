@@ -42,7 +42,7 @@ const register = async(req,res)=>{
     }
 
     const image ={
-        url: randomAvatar(),
+        url: `https://api.multiavatar.com/${username}.svg?apikey=qnG7IbSrQlLWiP`,
         public_id: nanoid(),
     }
 

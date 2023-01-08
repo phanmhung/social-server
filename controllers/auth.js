@@ -139,10 +139,32 @@ const getInformationUser = async (req, res) => {
         return res.status(400).json({msg:error.message});
     }
 }
+
+const suggestUser = async (req, res) => {
+    try{
+        //get current user
+        const user = await User.findById(req.user.userId);
+        
+        if(!user){
+            return res.status(400).json({msg:"User not found"});
+        }
+        //get list of following
+        const following = user.following;
+
+        const suggestions = await User.find({_id:{$nin:following}})
+        .select("-password -secret -email -followers -following -createdAt -updatedAt")
+        .limit(10);
+
+        return res.status(200).json({msg:"Find suggestions success",suggestions});
+    } catch(err){
+        return res.status(400).json({msg:err.message});
+    }
+}
 export {
     register,
     login,
     userFollower,
     addFollower,
-    getInformationUser
+    getInformationUser,
+    suggestUser,
 };

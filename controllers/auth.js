@@ -95,7 +95,7 @@ const addFollower = async (req, res,next ) => {
     try{
         const user = await User.findByIdAndUpdate(req.body.userId,{
             $addToSet: {
-                followers: req.user.userId
+                follower: req.user.userId
             },
         });
         if(!user){

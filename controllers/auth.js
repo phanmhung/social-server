@@ -160,6 +160,47 @@ const suggestUser = async (req, res) => {
         return res.status(400).json({msg:err.message});
     }
 }
+
+const listUserFollowing = async (req, res) => {
+    try{
+        const userId = req.params.userId;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(400).json({msg:"User not found"});
+        }
+        const following = user.following;
+        
+        const listFollowing = await User.find({_id:{$in:following}})
+        .select(
+            "-password -secret -email -followers -following -createdAt -updatedAt"
+        )
+        .limit(100);
+        return res.status(200).json({msg:"Find list following success",following: listFollowing, name: user.name});
+    } catch(err)
+    {
+        return res.status(400).json({msg:err.message});
+    }
+};
+
+const listUserFollower = async (req, res) => {
+    try{
+        const userId = req.params.userId;
+        const user = await User.findById(userId);
+        if(!user){
+            return res.status(400).json({msg:"User not found"});
+        }
+        let listFollower = user.follower;
+
+        const people = await User.find({_id:{$in:listFollower}})
+        .select(
+            "-password -secret -email -followers -following -createdAt -updatedAt"
+        )
+        .limit(100);
+        return res.status(200).json({msg:"Find list follower success",follower: people, name: user.name});
+    } catch(err){
+        return res.status(400).json({msg:err.message});
+    }
+}
 export {
     register,
     login,
@@ -167,4 +208,6 @@ export {
     addFollower,
     getInformationUser,
     suggestUser,
+    listUserFollower,
+    listUserFollowing
 };

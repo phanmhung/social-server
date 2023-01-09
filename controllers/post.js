@@ -1,6 +1,7 @@
 import Post from './../models/post.js';
 import cloudinary from 'cloudinary';
 import User from './../models/user.js';
+import mongoose from 'mongoose';
 
 cloudinary.config({
   cloud_name: 'dn2iwzms1',
@@ -85,8 +86,9 @@ const newsFeed = async (req, res) => {
 
 const getPostWithUserId = async (req, res) => {
   try {
-    const { userId } = req.param.userId;
-    const posts = await User.findById({ postedBy: { _id: userId } })
+    const userId  = req.params.userId;
+
+    const posts = await Post.find({ postedBy:  userId})
       .populate('postedBy', '-password -secret')
       .populate('comments.postedBy', '-password -secret')
       .sort({ createdAt: -1 });

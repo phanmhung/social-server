@@ -121,7 +121,7 @@ const userFollower = async (req, res) => {
     if(!user){
         return res.status(400).json({msg:"User not found"});
     }
-    res.status(200).json({msg:"Followed successfully"});
+    res.status(200).json({msg:"Followed successfully", user});
     } catch(err){
         return res.status(400).json({msg:err.message});
     }
@@ -155,7 +155,7 @@ const userUnfollower = async (req,res) =>{
         if(!user){
             return res.status(400).json({msg:"User not found"});
         }
-        res.status(200).json({msg:"Unfollowed successfully"});
+        res.status(200).json({msg:"Unfollowed successfully", user});
     } catch(err){
         return res.status(400).json({msg:err.message});
     }

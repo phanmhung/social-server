@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import validator from "validator";
 import randomAvatar from "../middleware/randomAvatar.js";
 import { nanoid } from "nanoid";
+import user from "./../models/user.js";
 
 // regex for special characters
 const regex = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/; 
@@ -126,6 +127,40 @@ const userFollower = async (req, res) => {
     }
 }
 
+const removeFollower = async (req,res,next) =>{
+    try{
+        const user = await user.findByIdAndUpdate(req.body.userId,{
+            $pull: {
+                followers: req.user.userId,
+            },
+        });
+        if(!user){
+            res.status(400).json({msg:"User not found"});
+        }
+        next();
+    } catch(err){
+        return res.status(400).json({msg:err.message});
+    }
+}
+
+const userUnfollower = async (req,res) =>{
+    try{
+        const user = await User.findByIdAndUpdate(
+            req.user.userId,
+            {
+                $pull: {following: req.body.userId},
+            },
+            {new: true}
+        );
+        if(!user){
+            return res.status(400).json({msg:"User not found"});
+        }
+        res.status(200).json({msg:"Unfollowed successfully"});
+    } catch(err){
+        return res.status(400).json({msg:err.message});
+    }
+}
+
 const getInformationUser = async (req, res) => {
     try{
         const _id = req.params.id;
@@ -206,6 +241,8 @@ export {
     login,
     userFollower,
     addFollower,
+    removeFollower,
+    userUnfollower,
     getInformationUser,
     suggestUser,
     listUserFollower,

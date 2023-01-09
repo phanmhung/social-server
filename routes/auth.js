@@ -9,6 +9,8 @@ import {
   suggestUser,
   listUserFollowing,
   listUserFollower,
+  removeFollower,
+  userUnfollower
 } from './../controllers/auth.js';
 
 const router = express.Router();
@@ -20,6 +22,8 @@ router.route('/register').post(register);
 router.route('/login').post(login);
 
 router.route('/user-follow').put(requireSignin, addFollower, userFollower);
+router.route('/user-unfollow').put(requireSignin, removeFollower, userUnfollower);
+
 router.route('/list-following/:userId').get(requireSignin, listUserFollowing);
 router.route('/list-follower/:userId').get(requireSignin, listUserFollower);
 router.route('/suggest-user').get(requireSignin, suggestUser);

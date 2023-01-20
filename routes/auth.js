@@ -10,7 +10,8 @@ import {
   listUserFollowing,
   listUserFollower,
   removeFollower,
-  userUnfollower
+  userUnfollower,
+  forgotPassword
 } from './../controllers/auth.js';
 
 const router = express.Router();
@@ -20,7 +21,7 @@ router.route('/').get(async (req, res) => {
 
 router.route('/register').post(register);
 router.route('/login').post(login);
-
+router.route('/forgot-password').post(forgotPassword);
 router.route('/user-follow').put(requireSignin, addFollower, userFollower);
 router.route('/user-unfollow').put(requireSignin, removeFollower, userUnfollower);
 

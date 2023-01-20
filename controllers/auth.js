@@ -91,6 +91,37 @@ const login = async(req,res)=>{
     return res.status(200).json({token,user});
 };
 
+const forgotPassword = async (req,res)=>{
+    try{
+        const{email, newPassword,rePassword,secret} = req.body;
+        if(!email || !newPassword ||!rePassword||!secret){
+            return res.status(400).json({msg:"Plese provide all fields!"})
+        }
+        if( newPassword.length < 8){
+            return res.status(400).json({msg:"Password must be at least 6 characters!"})
+        }
+        if(newPassword !== rePassword){
+            return res.status(400).json({msg:"Password do not match!"})
+        }
+
+        const isEmail = validator.isEmail(email);
+        if(!isEmail){
+            return res.status(400).json({message:"Invalid email"});
+        }
+
+        const user= await User.findOne({email,secret});
+        if(!user){
+            return res.status(400).json({msg:"Invalid email or secret!"})
+        }
+
+        user.password = newPassword;
+        user.save();
+        res.status(200).json({msg:"Password changed successfully!"})
+    } catch(err){
+        return res.status(400).json({msg:err.message});
+    }
+}
+
 const addFollower = async (req, res,next ) => {
     try{
         const user = await User.findByIdAndUpdate(req.body.userId,{
@@ -239,6 +270,7 @@ const listUserFollower = async (req, res) => {
 export {
     register,
     login,
+    forgotPassword,
     userFollower,
     addFollower,
     removeFollower,

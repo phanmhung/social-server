@@ -267,6 +267,24 @@ const listUserFollower = async (req, res) => {
         return res.status(400).json({msg:err.message});
     }
 }
+
+const searchUser = async (req,res)=>{
+    const {query} = req.params;
+    if(!query) return;
+    try{
+        // $regex is special method from mongodb
+        // The i modify is used to preform case-insensitive matching
+        const search = await User.find({
+            $or: [{name: {$regex: query, $options: "i"}}],
+        }).select(
+            "-password -secret -email -following -follower -createdAt -updatedAt"
+        );
+        return res.status(200).json({msg:"Search user success",search});
+
+    } catch (error){
+        return res.status(400).json({msg:error.message});
+    }
+}
 export {
     register,
     login,
@@ -278,5 +296,6 @@ export {
     getInformationUser,
     suggestUser,
     listUserFollower,
-    listUserFollowing
+    listUserFollowing,
+    searchUser
 };

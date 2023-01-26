@@ -1,4 +1,4 @@
-import Message from "../models/message";
+import Message from "../models/message.js";
 import cloudinary from "cloudinary";
 
 //config cloudinary
@@ -11,79 +11,85 @@ cloudinary.config({
 const getAllMessages = async (req, res) => {
     try {
         const userId = req.user.userId;
-        const messages = await Message.find({members:{$in:userId}})
-        .populate(
-            "members", 
-            "-password -secret -email -followers -following -createdAt -updatedAt -about -username")
-        .populate(
-            "content.sentBy",
-            "-password -secret -email -followers -following -createdAt -updatedAt -about -username")
-        .sort({updatedAt:-1});
-    } catch (err) {
-        return res.status(400).json({ msg: err.message });
+        const messages = await Message.find({members: {$in: userId}})
+            .populate(
+                "members",
+                "-password -secret -following -follower -role -updatedAt -email -createdAt -about -username"
+            )
+            .populate(
+                "content.sentBy",
+                "-password -secret -following -follower -role -updatedAt -email -createdAt -about -username"
+            )
+            .sort({updatedAt: -1});
+        return res.status(200).json({messages});
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({msg: `Something went wrong!Try again!`});
     }
-}
+};
 
 const sendMessage = async (req, res) => {
-    try{
+    try {
+        console.log("🚀 ~ file: message.js:46 ~ sendMessage ~ req.body", req.body)
         const userId = req.user.userId;
-        let data = { sentBy: userID};
+        let data = {sentBy: userId};
         const {receivedId, text, image} = req.body;
-        const limit = req.body.limit || 10;
-        if(!receivedId.length || receivedId.includes(null)){
-            return res.status(400).json({msg:"Please select a user to send message"});
+        // const limit = req.body.limit || 10;
+        if (!receivedId.length || receivedId.includes(null)) {
+            return res
+                .status(400)
+                .json({msg: `Something went wrong!Try again!`});
         }
-        if(image){
-            data.image=image;
+        if (image) {
+            data.image = image;
         }
-
-        if(text){
-            data.text=text;
+        if (text) {
+            data.text = text;
         }
-
-        if(!image && !text){
-            return res.status(400).json({msg:"Please enter a message"});
+        if (!image && !text) {
+            return res.status(400).json({msg: "Text or image is required!"});
         }
-
-        //seen data
+        // data.seen
         let message = await Message.findOneAndUpdate(
             {
-                members:[...receivedId, userId].sort(),
+                members: [...receivedId, userId].sort(),
             },
             {
-                $addToSet:{ content: data},
+                $addToSet: {content: data},
             },
-            {new:true}
-            ).populate(
+            {new: true}
+        )
+            .populate(
                 "content.sentBy",
-                "-password -secret -email -followers -following -createdAt -updatedAt -about -username"
+                "-password -secret -following -follower -role -updatedAt -email -createdAt -about -username"
+            )
+            .populate(
+                "members",
+                "-password -secret -following -follower -role -updatedAt -email -createdAt -about -username"
             );
 
-            if(!message){
-                message = await Message.create({
-                    members:[...receivedId, userId].sort(),
-                    content: data,
-                });
-                message = await Message.findById(message._id).populate(
+        if (!message) {
+            message = await Message.create({
+                members: [userId, ...receivedId].sort(),
+                content: data,
+            });
+            message = await Message.findById(message._id)
+                .populate(
                     "members",
-                    "-password -secret -email -followers -following -role -createdAt -updatedAt -about -username"
+                    "-password -secret -following -follower -role -updatedAt -email -createdAt -about -username"
                 )
                 .populate(
                     "content.sentBy",
-                    "-password -secret -email -followers -following -role -createdAt -updatedAt -about -username"
+                    "-password -secret -following -follower -role -updatedAt -email -createdAt -about -username"
                 );
-            }
+        }
 
-            return res.status(200).json({msg:"Message sent", message});
-    } catch (err) {
-        return res.status(400).json({ msg: err.message });
+        return res.status(200).json({message: message});
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({msg: "Something went wrong!Try again!"});
     }
 };
-
 const isRead = async (req, res) => {};
 
-export {
-    getAllMessages,
-    sendMessage,
-    isRead
-};
+export {getAllMessages, sendMessage, isRead};

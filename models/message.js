@@ -4,45 +4,47 @@ const messageSchema = new mongoose.Schema(
     {
         members: [
             {
-                type: mongoose.Schema.Types.ObjectId,
+                type: mongoose.Types.ObjectId,
                 ref: "User",
-            }
+            },
         ],
         content: [
             {
-                text:String,
-                image:{
-                    url:String,
-                    public_id:String,
-                    default:{
-                        url:"",
-                        public_id:"",
-                    }
+                text: String,
+                image: {
+                    url: String,
+                    public_id: String,
+                    default: {
+                        url: "",
+                        public_id: "",
+                    },
                 },
-                createdAt:{
-                    type:Date,
-                    default:Date.now,
+                created: {
+                    type: Date,
+                    default: Date.now,
                 },
-                like:{
-                    type:boolean,
-                    default:false,
-                },
+                like: [
+                    {
+                        type: mongoose.Types.ObjectId,
+                        ref: "User",
+                    },
+                ],
                 sentBy: {
-                    type: mongoose.Schema.Types.ObjectId,
+                    type: mongoose.Types.ObjectId,
                     ref: "User",
                 },
-                reply:{
-                    type: mongoose.Schema.Types.ObjectId,
+                reply: {
+                    type: mongoose.Types.ObjectId,
                     ref: "Message",
                 },
-                seen:[
+                seen: [
                     {
-                        type: mongoose.Schema.Types.ObjectId,
+                        type: mongoose.Types.ObjectId,
                         ref: "User",
-                    }
-                ]
-            }
-        ]
+                    },
+                ],
+            },
+        ],
     },
     {timestamps: true}
 );

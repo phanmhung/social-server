@@ -86,9 +86,9 @@ const newsFeed = async (req, res) => {
 
 const getPostWithUserId = async (req, res) => {
   try {
-    const userId  = req.params.userId;
+    const userId = req.params.userId;
 
-    const posts = await Post.find({ postedBy:  userId})
+    const posts = await Post.find({ postedBy: userId })
       .populate('postedBy', '-password -secret')
       .populate('comments.postedBy', '-password -secret')
       .sort({ createdAt: -1 });
@@ -149,6 +149,45 @@ const removeComment = async (req, res) => {
   }
 };
 
+const likePost = async (req, res) => {
+  try {
+    const postId = req.body.postId;
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $addToSet: { likes: req.user.userId },
+      },
+      {
+        new: true,
+      }
+    );
+  
+    return res.status(200).json({ msg: 'Liked', post });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: err });
+  }
+};
+
+const unlikePost = async (req, res) => {
+  try {
+    const postId = req.body.postId;
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $pull: { likes: req.user.userId },
+      },
+      {
+        new: true,
+      }
+    );
+    return res.status(200).json({ msg: 'Unliked', post });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).json({ msg: error });
+  }
+};
+
 export {
   createPost,
   uploadImage,
@@ -156,4 +195,6 @@ export {
   getPostWithUserId,
   addComment,
   removeComment,
+  likePost,
+  unlikePost,
 };

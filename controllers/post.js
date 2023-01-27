@@ -262,20 +262,88 @@ const addReplyComment = async (req, res) => {
   }
 };
 
+const likeReplyComment = async (req, res) => {
+  try {
+      const {postId, commentId, replyId} = req.body;
+      const post = await Post.findById(postId);
+      let {reply} = post.comments.id(commentId);
+      let currentReply = reply.id(replyId);
+      if (!currentReply["like"].includes(req.user.userId)) {
+          currentReply["like"].push(req.user.userId);
+      }
+      await post.save();
+      return res.status(200).json({reply: currentReply});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
+
+const unlikeReplyComment = async (req, res) => {
+  try {
+      const {postId, commentId, replyId} = req.body;
+      const post = await Post.findById(postId);
+      let {reply} = post.comments.id(commentId);
+      let currentReply = reply.id(replyId);
+      if (currentReply["like"].includes(req.user.userId)) {
+          currentReply["like"].splice(
+              currentReply["like"].indexOf(req.user.userId),
+              1
+          );
+      }
+      await post.save();
+      return res.status(200).json({reply: currentReply});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
+
+const deleteReplyComment = async (req, res) => {
+  try {
+      const {postId, commentId, replyId} = req.body;
+      const post = await Post.findById(postId)
+          .populate("postedBy", "-password -secret")
+          .populate("comments.postedBy", "-password -secret")
+          .populate("comments.reply.postedBy", "-password -secret");
+      let {reply} = post.comments.id(commentId);
+      let index = -1;
+      reply.forEach((v, k) => {
+          if (String(v._id) === replyId) {
+              index = k;
+          }
+      });
+      reply.splice(index, 1);
+      await post.save();
+      return res.status(200).json({reply});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
+
 
 export {
   createPost,
   uploadImage,
   newsFeed,
   getPostWithUserId,
+
+  //post
+  likePost,
+  unlikePost,
+
+  //comment
   addComment,
   removeComment,
   editComment,
   likeComment,
   unlikeComment,
   
+  // reply comment
   addReplyComment,
+  likeReplyComment,
+  unlikeReplyComment,
+  deleteReplyComment,
 
-  likePost,
-  unlikePost,
 };

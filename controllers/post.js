@@ -187,6 +187,36 @@ const unlikePost = async (req, res) => {
     return res.status(400).json({ msg: error });
   }
 };
+const likeComment = async (req, res) => {
+  try {
+      const {postId, commentId} = req.body;
+      const post = await Post.findById(postId);
+      let comment = post.comments.id(commentId);
+      if (!comment["like"].includes(req.user.userId)) {
+          comment["like"].push(req.user.userId);
+      }
+      await post.save();
+      return res.status(200).json({comment});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
+const unlikeComment = async (req, res) => {
+  try {
+      const {postId, commentId} = req.body;
+      const post = await Post.findById(postId);
+      let comment = post.comments.id(commentId);
+      if (comment["like"].includes(req.user.userId)) {
+          comment["like"].splice(comment["like"].indexOf(req.user.userId), 1);
+      }
+      await post.save();
+      return res.status(200).json({comment});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
 
 export {
   createPost,
@@ -195,6 +225,9 @@ export {
   getPostWithUserId,
   addComment,
   removeComment,
+  likeComment,
+  unlikeComment,
+
   likePost,
   unlikePost,
 };

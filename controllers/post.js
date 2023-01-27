@@ -125,6 +125,23 @@ const addComment = async (req, res) => {
   }
 };
 
+const editComment = async (req, res) => {
+  try {
+      const {postId, text, commentId, image} = req.body;
+      let data = {"comments.$.text": text, "comments.$.image": image};
+      const post = await Post.updateOne(
+          {_id: postId, "comments._id": commentId},
+          {
+              $set: data,
+          }
+      );
+      return res.status(200).json({post});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
+
 const removeComment = async (req, res) => {
   try {
     const { postId, commentId } = req.body;
@@ -218,6 +235,34 @@ const unlikeComment = async (req, res) => {
   }
 };
 
+const addReplyComment = async (req, res) => {
+  try {
+      const {postId, commentId, image, text} = req.body;
+      let data = {text, postedBy: req.user.userId};
+      if (image) {
+          data.image = image;
+      }
+      const post = await Post.findById(postId)
+          .populate("postedBy", "-password -secret")
+          .populate("comments.postedBy", "-password -secret")
+          .populate("comments.reply.postedBy", "-password -secret");
+      let comment = post.comments.id(commentId);
+      comment["reply"].push(data);
+      await post.save();
+
+      const newPost = await Post.findById(postId)
+          .populate("postedBy", "-password -secret")
+          .populate("comments.postedBy", "-password -secret")
+          .populate("comments.reply.postedBy", "-password -secret");
+      const newComment = newPost.comments.id(commentId);
+      return res.status(200).json({comment: newComment});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
+
+
 export {
   createPost,
   uploadImage,
@@ -225,8 +270,11 @@ export {
   getPostWithUserId,
   addComment,
   removeComment,
+  editComment,
   likeComment,
   unlikeComment,
+  
+  addReplyComment,
 
   likePost,
   unlikePost,

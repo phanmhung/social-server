@@ -1,6 +1,6 @@
 import express from "express";
 import formidable from "express-formidable";
-import { addComment, createPost, getPostWithUserId, likeComment, likePost, newsFeed, removeComment, unlikeComment, unlikePost, uploadImage } from "../controllers/post.js";
+import { addComment, addReplyComment, createPost, editComment, getPostWithUserId, likeComment, likePost, newsFeed, removeComment, unlikeComment, unlikePost, uploadImage } from "../controllers/post.js";
 
 const router = express.Router();
 
@@ -25,5 +25,7 @@ router.route('/add-comment').put(addComment);
 router.route('/remove-comment').put(removeComment);
 router.route("/like-comment").put(likeComment);
 router.route("/unlike-comment").put(unlikeComment);
+router.route("/edit-comment").patch(editComment);
+router.route("/add-reply-comment").put(addReplyComment);
 
 export default router;

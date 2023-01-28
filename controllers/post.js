@@ -74,6 +74,7 @@ const newsFeed = async (req, res) => {
       .skip((page - 1) * perPage)
       .populate('postedBy', '-password -secret')
       .populate('comments.postedBy', '-password -secret')
+      .populate('comments.reply.postedBy', '-password -secret')
       .sort('-createdAt')
       .limit(perPage);
 
@@ -88,9 +89,10 @@ const getPostWithUserId = async (req, res) => {
   try {
     const userId = req.params.userId;
 
-    const posts = await Post.find({ postedBy: userId })
+    const posts = await Post.find({ postedBy: {_id:userId} })
       .populate('postedBy', '-password -secret')
       .populate('comments.postedBy', '-password -secret')
+      .populate('comments.reply.postedBy', '-password -secret')
       .sort({ createdAt: -1 });
     return res.status(200).json({ posts });
   } catch (error) {
@@ -238,10 +240,11 @@ const unlikeComment = async (req, res) => {
 const addReplyComment = async (req, res) => {
   try {
       const {postId, commentId, image, text} = req.body;
-      let data = {text, postedBy: req.user.userId};
+
       if (image) {
           data.image = image;
       }
+      console.log("🚀 ~ file: post.js:247 ~ addReplyComment ~ data", data)
       const post = await Post.findById(postId)
           .populate("postedBy", "-password -secret")
           .populate("comments.postedBy", "-password -secret")
@@ -249,6 +252,7 @@ const addReplyComment = async (req, res) => {
       let comment = post.comments.id(commentId);
       comment["reply"].push(data);
       await post.save();
+      
 
       const newPost = await Post.findById(postId)
           .populate("postedBy", "-password -secret")

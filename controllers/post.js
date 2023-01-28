@@ -238,11 +238,11 @@ const unlikeComment = async (req, res) => {
 const addReplyComment = async (req, res) => {
   try {
       const {postId, commentId, image, text} = req.body;
-
+      let data = {text, postedBy: req.user.userId};
       if (image) {
           data.image = image;
       }
-      console.log("🚀 ~ file: post.js:247 ~ addReplyComment ~ data", data)
+    
       const post = await Post.findById(postId)
           .populate("postedBy", "-password -secret")
           .populate("comments.postedBy", "-password -secret")

@@ -159,10 +159,10 @@ const userFollower = async (req, res) => {
 }
 
 const removeFollower = async (req,res,next) =>{
-    try{
-        const user = await user.findByIdAndUpdate(req.body.userId,{
+    try{ 
+        const user = await User.findByIdAndUpdate(req.body.userId,{
             $pull: {
-                followers: req.user.userId,
+                follower: req.user.userId,
             },
         });
         if(!user){

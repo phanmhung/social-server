@@ -69,15 +69,13 @@ const newsFeed = async (req, res) => {
 
     const page = Number(req.query.page) || 1;
     const perPage = Number(req.query.page) || 3;
-
     const posts = await Post.find({ postedBy: { $in: following } })
       .skip((page - 1) * perPage)
       .populate('postedBy', '-password -secret')
       .populate('comments.postedBy', '-password -secret')
       .populate('comments.reply.postedBy', '-password -secret')
-      .sort('-createdAt')
+      .sort({createdAt: -1})
       .limit(perPage);
-
     return res.status(200).json({ posts });
   } catch (error) {
     console.log(error);

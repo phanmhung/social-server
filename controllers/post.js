@@ -1,7 +1,6 @@
-import Post from './../models/post.js';
 import cloudinary from 'cloudinary';
+import Post from './../models/post.js';
 import User from './../models/user.js';
-import mongoose from 'mongoose';
 
 cloudinary.config({
   cloud_name: 'dn2iwzms1',
@@ -324,6 +323,41 @@ const deleteReplyComment = async (req, res) => {
   }
 };
 
+const allPosts = async (req, res) => {
+  try {
+      const page = Number(req.query.page) || 1;
+      const perPage = Number(req.query.perPage) || 10;
+      const posts = await Post.find({})
+          .populate("postedBy", "-password -secret")
+          .limit(perPage)
+          .skip((page - 1) * perPage)
+          .sort({createdAt: -1});
+      if (!posts) {
+          return res.status(400).json({msg: "No posts found!"});
+      }
+      const postsCount = await Post.find({}).estimatedDocumentCount();
+      return res.status(200).json({posts, postsCount});
+  } catch (error) {
+      console.log(error);
+      return res.status(400).json({msg: error});
+  }
+};
+
+const deletePost = async (req, res) => {
+  try {
+      const postId = req.params.id;
+      const post = await Post.findByIdAndDelete(postId);
+      if (!post) {
+          return res.status(400).json({msg: "No post found!"});
+      }
+      if (post.image && post.image.public_id) {
+          await cloudinary.v2.uploader.destroy(post.image.public_id);
+      }
+      return res.status(200).json({msg: "Deleted post!"});
+  } catch (error) {
+      return res.status(400).json({msg: error});
+  }
+};
 
 export {
   createPost,
@@ -341,11 +375,16 @@ export {
   editComment,
   likeComment,
   unlikeComment,
-  
+
   // reply comment
   addReplyComment,
   likeReplyComment,
   unlikeReplyComment,
   deleteReplyComment,
 
+  //admin
+  allPosts,
+  deletePost,
+
 };
+

@@ -1,9 +1,7 @@
-import User from "./../models/user.js";
 import jwt from "jsonwebtoken";
-import validator from "validator";
-import randomAvatar from "../middleware/randomAvatar.js";
 import { nanoid } from "nanoid";
-import user from "./../models/user.js";
+import validator from "validator";
+import User from "./../models/user.js";
 
 // regex for special characters
 const regex = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/; 
@@ -285,6 +283,37 @@ const searchUser = async (req,res)=>{
         return res.status(400).json({msg:error.message});
     }
 }
+
+const allUsers = async (req, res) => {
+    try {
+        const page = Number(req.query.page) || 1;
+        const perPage = Number(req.query.perPage) || 10;
+        const users = await User.find({})
+            .select("-password -secret")
+            .skip((page - 1) * perPage)
+            .sort({createdAt: -1})
+            .limit(perPage);
+        if (!users) {
+            return res.status(400).json({msg: "No user found!"});
+        }
+        const numberUsers = await User.find({}).estimatedDocumentCount();
+        return res.status(200).json({users, numberUsers});
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({msg: "Something went wrong. Try again!"});
+    }
+};
+
+const currentUser = async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId);
+        return res.status(200).json({user, ok: true});
+    } catch (error) {
+        console.log(error);
+        return res.status(400).json({msg: "Error. Try again!"});
+    }
+};
+
 export {
     register,
     login,
@@ -297,5 +326,8 @@ export {
     suggestUser,
     listUserFollower,
     listUserFollowing,
-    searchUser
+    searchUser,
+
+    allUsers,
+    currentUser,
 };

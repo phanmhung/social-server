@@ -30,7 +30,7 @@ const getAllMessages = async (req, res) => {
 
 const sendMessage = async (req, res) => {
     try {
-        console.log("🚀 ~ file: message.js:46 ~ sendMessage ~ req.body", req.body)
+        
         const userId = req.user.userId;
         let data = {sentBy: userId};
         const {receivedId, text, image} = req.body;

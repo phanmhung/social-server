@@ -1,5 +1,6 @@
 import express from 'express';
 import requireSignin from '../middleware/authentication.js';
+import isAdmin from '../middleware/isAdmin.js';
 import {
   register,
   login,
@@ -12,7 +13,9 @@ import {
   removeFollower,
   userUnfollower,
   forgotPassword,
-  searchUser
+  searchUser,
+  allUsers,
+  currentUser,
 } from './../controllers/auth.js';
 
 const router = express.Router();
@@ -32,6 +35,9 @@ router.route('/list-following/:userId').get(requireSignin, listUserFollowing);
 router.route('/list-follower/:userId').get(requireSignin, listUserFollower);
 router.route('/suggest-user').get(requireSignin, suggestUser);
 
+//Admin priority
+router.route("/all-users").get(requireSignin, isAdmin, allUsers);
+router.route("/current-admin").get(requireSignin, isAdmin, currentUser);
 
 router.route('/:id').get(requireSignin, getInformationUser);
 export default router;
